@@ -1,13 +1,18 @@
 class ArticlesController < ApplicationController
 
-    http_basic_authenticate_with name: "dhh", password: "secret", except: [:index, :show]
-
+    # http_basic_authenticate_with name: "dhh", password: "secret", except: [:index, :show]
+    load_and_authorize_resource
+    
     def index
         @articles = Article.all
+        @user = current_user
     end
 
     def show
         @article = Article.find(params[:id])
+        # @user = Article.user
+        # @user = current_user
+
     end
 
     def new
@@ -19,13 +24,15 @@ class ArticlesController < ApplicationController
     end
 
     def create
-        @article = Article.new(article_params)
-
+        @article = Article.new(article_params.merge(user_id: current_user.id))
+        puts current_user.id
+        # @article.user.id
         if @article.save
             redirect_to @article #redirect data to show
         else
             render 'new'
         end
+
     end
 
     def update
